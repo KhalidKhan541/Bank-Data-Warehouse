@@ -1,0 +1,34 @@
+database:
+  url: sqlite:///warehouse.db
+
+data:
+  n_customers: 5000
+  n_transactions: 500000
+  seed: 42
+
+quality_checks:
+  dim_customer:
+    not_null: [customer_id, customer_name, email]
+    unique: [customer_id]
+    values_in_set:
+      gender: [Male, Female, Non-binary]
+      customer_segment: [Premium, Regular, Basic]
+  fact_transaction:
+    not_null: [transaction_id, customer_sk, product_sk, amount, date_sk]
+    unique: [transaction_id]
+    range:
+      amount: [0.01, 1000000]
+  dim_product:
+    not_null: [product_id, product_name]
+    unique: [product_id]
+
+scd_type2:
+  tracked_columns: [customer_name, email, phone, address, city, state, income_bracket, customer_segment]
+
+analytical_views:
+  churn:
+    inactive_threshold_days: 60
+    windows: [30, 60, 90]
+  cross_sell:
+    min_support: 0.01
+    affinity_threshold: 0.1
